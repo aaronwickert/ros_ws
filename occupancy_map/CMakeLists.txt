@@ -32,7 +32,7 @@ message(${OpenCV_DIR})
 find_package(OpenCV REQUIRED)
 
 
-add_executable(occupancy_map src/occupancy_map.cpp src/object_detector.cpp)
+add_executable(occupancy_map src/occupancy_map.cpp src/object_detector.cpp src/trajectory_planer.cpp)
 ament_target_dependencies(occupancy_map rclcpp sensor_msgs std_msgs cv_bridge OpenCV pcl_ros pcl_conversions)
 
 include_directories(occupancy_map ${OpenCV_INCLUDE_DIRS})

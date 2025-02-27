@@ -1,7 +1,7 @@
 #include "../include/occupancy_map.h"
 #include "../include/object_detector.h"
 #include <cv_bridge/cv_bridge.h>
-
+#include "../include/trajectory_planer.h"
 
 OccupancyMap::OccupancyMap() : Node("om"){
     subPC = this->create_subscription<sensor_msgs::msg::PointCloud2>("/camera/rgb/points", 5, std::bind(&OccupancyMap::pc_callback, this, std::placeholders::_1));
@@ -87,6 +87,8 @@ std::vector<Point> astar_pathfinding(std::vector<std::vector<int>>& grid, Point 
 }
 
 
+
+
 int main(int argc, char *argv[]) {
 
     std::vector<std::vector<int>> grid = {
@@ -98,12 +100,25 @@ int main(int argc, char *argv[]) {
     };
     Point start = {0, 0}, goal = {4, 4};
 
-    std::cout << "kek\n";
+    TrajectoryPlaner tp;
 
-    
-    std::cout << "kek\n";
 
     std::vector<Point> path = astar_pathfinding(grid, start, goal);
+    std::vector<PointHermite> pathHermite;
+    std::vector<double> times;
+    for (int i = 0; i < path.size(); i++){
+        times.push_back(static_cast<double>(i));
+        PointHermite p;
+        p.x = static_cast<double>(path[i].first) + 0.5;
+        p.y = static_cast<double>(path[i].second) + 0.5;
+        pathHermite.push_back(p);
+    }
+
+    int resolution = 10;
+
+    tp.generate_trajectory(pathHermite, times, resolution);
+
+
     
     for (auto p : path) {
         std::cout << "(" << p.first << ", " << p.second << ") -> ";

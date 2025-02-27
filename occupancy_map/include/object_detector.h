@@ -12,6 +12,7 @@
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl/common/centroid.h>
 
 // MESSAGES
 #include <sensor_msgs/msg/image.hpp>
@@ -22,6 +23,7 @@ public:
     bool _debug_ransac = true;
     bool _debug_voxel = true;
     bool _debug_clustering = true;
+    bool _debug_projection = true;
     std::string _name = "ObjectDetector";
     double _minPercentage = 0.1;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubPCplane, pubPCobj, pubPCcolor, pubPCvox;
@@ -35,5 +37,7 @@ public:
     void publish_pointcloud_rgb(pcl::PointCloud<pcl::PointXYZRGB> pc, rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub);
     void plane_segmentation(const sensor_msgs::msg::PointCloud2::SharedPtr in);
     double distance_point2plane(pcl::PointXYZ point, pcl::ModelCoefficients::Ptr coefficients);
+    double get_radius(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
+    void project_obstacles(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> objets);
 private:
 };

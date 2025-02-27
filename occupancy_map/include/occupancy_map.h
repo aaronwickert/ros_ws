@@ -53,7 +53,7 @@ public:
 
 
     OccupancyMap();
-    //std::vector<Point> astar_pathfinding(std::vector<std::vector<int>>& grid, Point start, Point goal);
+    std::vector<Point> astar_pathfinding(std::vector<std::vector<int>>& grid, Point start, Point goal);
     void create_occupancy_map(const sensor_msgs::msg::PointCloud2::SharedPtr pc, cv::Mat& occupancyMap);
     void pc_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
     void publish_occupancyMapVis(cv::Mat& occupancyMap);

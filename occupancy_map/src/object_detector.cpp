@@ -138,6 +138,7 @@ void ObjectDetector::clustering(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud){
             j++;
         }
         publish_pointcloud_rgb(*cloudObj, pubPCobj);
+        project_obstacles(obj);
     }
 }
 
@@ -255,6 +256,31 @@ void ObjectDetector::ransac_ground_filter(pcl::PointCloud<pcl::PointXYZ>::Ptr cl
     publish_pointcloud_rgb(*cloudVis, pubPCcolor);
     publish_pointcloud(*cloudOut, pubPCplane);
     cloud = cloudOut;
+}
+
+void ObjectDetector::project_obstacles(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> objects){
+    std::vector<double> radii;
+    std::vector<Eigen::Vector4f> centroids;
+    for (int i = 0; i < objects.size(); i++){
+        Eigen::Vector4f centroid;
+        pcl::compute3DCentroid(*objects[i], centroid);
+        centroids.push_back(centroid);
+        radii.push_back(get_radius(objects[i]));
+        std::cout << centroids.back() << " , " << radii.back() << std::endl;
+    }
+}
+
+double ObjectDetector::get_radius(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud){
+    double maxDist = 0;
+    for (int i = 0; i < cloud->width * cloud->height; i++){
+        for (int j = 0; j < cloud->width * cloud->height; j++){
+            if (i == j) continue;
+            pcl::PointXYZ p1 = cloud->points[i], p2 = cloud->points[j];
+            double curDist = std::sqrt(std::pow(p1.x - p2.x, 2) + std::pow(p1.y -p1.y, 2));
+            if (maxDist < curDist) maxDist = curDist;
+        }
+    }
+    return maxDist;
 }
 
 void ObjectDetector::plane_segmentation(const sensor_msgs::msg::PointCloud2::SharedPtr in){
